@@ -4,11 +4,12 @@
     <p class="eyebrow">TU ESPACIO</p>
     <button class="new-note" type="button" (click)="newNote()"><span aria-hidden="true">＋</span> Nueva nota</button>
     <label class="search-box"><span aria-hidden="true">⌕</span><input aria-label="Buscar notas" placeholder="Buscar notas..." [ngModel]="search()" (ngModelChange)="search.set($event)"></label>
+    <div class="backup-actions"><button type="button" (click)="exportBackup()">↓ Exportar respaldo</button><label class="import-button">↑ Importar respaldo<input type="file" accept="application/json,.json" (change)="importBackup($event)"></label></div>
     <p class="list-heading">MIS NOTAS <span>{{ filteredNotes().length }}</span></p>
     <nav class="notes-list" aria-label="Lista de notas">
       @for (note of filteredNotes(); track note.id) {
         <button class="note-row" [class.active]="selectedId() === note.id" type="button" (click)="selectNote(note)">
-          <span class="note-title">{{ note.title }}</span><span class="note-preview">{{ note.content || 'Sin contenido' }}</span><span class="note-date">{{ formattedDate(note.updatedAt) }}</span>
+          <span class="note-title">{{ note.title }}</span><span class="note-preview">{{ note.content || 'Sin contenido' }}</span><span class="note-tags">@for (tag of note.tags; track tag) { <span>{{ tag }}</span> }</span><span class="note-date">{{ formattedDate(note.updatedAt) }}</span>
         </button>
       } @empty { <p class="sidebar-empty">{{ search() ? 'No hay coincidencias.' : 'Tus notas aparecerán aquí.' }}</p> }
     </nav>
@@ -19,10 +20,11 @@
     <section class="editor" aria-label="Editor de nota">
       <div class="editor-meta"><span class="meta-icon">✎</span><span>{{ selectedId() ? 'EDITANDO NOTA' : 'NUEVA NOTA' }}</span><span class="meta-line"></span><span>{{ selectedNote() ? 'Última edición ' + formattedDate(selectedNote()?.updatedAt ?? '') : 'Borrador' }}</span></div>
       <label class="sr-only" for="note-title">Título de la nota</label>
-      <input id="note-title" class="title-input" placeholder="Título de tu nota" [ngModel]="draftTitle()" (ngModelChange)="draftTitle.set($event)" maxlength="120">
+      <input id="note-title" class="title-input" placeholder="Título de tu nota" [ngModel]="draftTitle()" (ngModelChange)="updateDraft('title', $event)" maxlength="120">
       <div class="editor-rule"></div>
+      <label class="tags-field"><span>ETIQUETAS</span><input aria-label="Etiquetas separadas por comas" placeholder="Ej. trabajo, ideas, personal" [ngModel]="draftTags()" (ngModelChange)="updateDraft('tags', $event)"></label>
       <label class="sr-only" for="note-content">Contenido de la nota</label>
-      <textarea id="note-content" class="content-input" placeholder="Empieza a escribir tus ideas aquí..." [ngModel]="draftContent()" (ngModelChange)="draftContent.set($event)"></textarea>
+      <textarea id="note-content" class="content-input" placeholder="Empieza a escribir tus ideas aquí..." [ngModel]="draftContent()" (ngModelChange)="updateDraft('content', $event)"></textarea>
       <footer class="editor-footer"><span class="save-message" aria-live="polite">{{ message() || 'Tus ideas, siempre a mano.' }}</span><div class="actions">@if (selectedId()) { <button class="delete-button" type="button" (click)="deleteNote()">Eliminar</button> }<button class="save-button" type="button" (click)="saveNote()"><span aria-hidden="true">✓</span> Guardar nota</button></div></footer>
     </section>
     <div class="bottom-hint"><span>HECHO PARA PENSAR CON CLARIDAD</span><span>✦</span></div>
